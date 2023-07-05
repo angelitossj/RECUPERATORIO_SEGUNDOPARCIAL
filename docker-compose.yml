@@ -1,0 +1,49 @@
+version: '3'
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:8.0.33  # Aquí puedes especificar la versión deseada de MySQL
+    restart: always
+    environment:
+     - MYSQL_ROOT_PASSWORD=angelito
+    ports:
+      - 3309:3306
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  mariadb:
+    image: mariadb:10.6.14
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=angelito 
+    ports: 
+    - 3307:3306 
+      
+  mongodb:
+    image: mongo:6.0
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb-data:/data/db
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - 3000:5000
+    depends_on:
+      - mysql
+      - mariadb
+      - mongodb
+    environment:
+    - MONGODB_HOST=mongodb
+    - MYSQL_HOST=mysql
+    - MYSQL_USER=root
+    - MYSQL_ROOT_PASSWORD=angelito
+    - MARIADB_HOST=mariadb
+    - MARIADB_USER=root
+    - MARIADB_ROOT_PASSWORD=angelito
+volumes:
+  mysql-data:
+  mongodb-data:
